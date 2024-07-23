@@ -1,9 +1,5 @@
 const { InlineKeyboard, session } = require('grammy');
-const {
-  commands,
-  commandsForDrivers,
-  commandsForPassengers,
-} = require('./commands');
+const { commands } = require('./commands');
 const { completeRegistration } = require('./utils/utils');
 
 const {
@@ -212,6 +208,7 @@ const startBot = (bot) => {
   });
 
   bot.command('show_profile', async (ctx) => {
+    console.log('cdscmdls');
     console.log('show_profile' + ctx.session.role);
     console.log('Session after handling text:', ctx.session);
 
@@ -340,14 +337,18 @@ const startBot = (bot) => {
     }
   });
 
-  bot.on(':text', async (ctx) => {
-    if (ctx.session.registrationStep === 'ask_name') {
+  bot.on('message:text', async (ctx) => {
+    const userId = ctx.from.id;
+
+    const registrationStep = ctx.session.registrationStep;
+
+    if (registrationStep === 'ask_name') {
       ctx.session.userData = ctx.session.userData || {};
       ctx.session.userData.name = ctx.message.text;
       ctx.session.registrationStep = 'ask_phone';
 
       await ctx.reply('Введите Ваш номер телефона:');
-    } else if (ctx.session.registrationStep === 'ask_phone') {
+    } else if (registrationStep === 'ask_phone') {
       ctx.session.userData = ctx.session.userData || {};
       ctx.session.userData.phone = ctx.message.text;
 
@@ -356,31 +357,21 @@ const startBot = (bot) => {
         await ctx.reply('Введите Ваш возраст:');
       } else {
         await completeRegistration(ctx);
-        if (ctx.session.role === 'passenger') {
-          bot.api.setMyCommands(commandsForPassengers);
-        } else if (ctx.session.role === 'driver') {
-          bot.api.setMyCommands(commandsForDrivers);
-        } else {
-          bot.api.setMyCommands(commands);
-        }
       }
-    } else if (ctx.session.registrationStep === 'ask_age') {
+    } else if (registrationStep === 'ask_age') {
       ctx.session.userData = ctx.session.userData || {};
       ctx.session.userData.age = ctx.message.text;
       ctx.session.registrationStep = 'ask_car';
 
       await ctx.reply('Введите марку и модель Вашего автомобиля:');
-    } else if (ctx.session.registrationStep === 'ask_car') {
+    } else if (registrationStep === 'ask_car') {
       ctx.session.userData = ctx.session.userData || {};
       ctx.session.userData.car = ctx.message.text;
       await completeRegistration(ctx);
-      if (ctx.session.role === 'passenger') {
-        bot.api.setMyCommands(commandsForPassengers);
-      } else if (ctx.session.role === 'driver') {
-        bot.api.setMyCommands(commandsForDrivers);
-      } else {
-        bot.api.setMyCommands(commands);
-      }
+    } else {
+      await ctx.reply(
+        'Ой >_<. Выберите один из пунктов меню для работы дальше!'
+      );
     }
   });
 

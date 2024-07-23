@@ -61,7 +61,7 @@ const pickDriverCallback = async (data, ctx) => {
           englishSeat
         );
 
-        // await ctx.reply(`Вы успешно забронировали место ${seat} у водителя.`);
+        await ctx.reply(`Вы успешно забронировали место ${seat} у водителя.`);
       } catch (err) {
         console.error('Ошибка при бронировании места:', err);
         await ctx.reply('Произошла ошибка бронирования места.');

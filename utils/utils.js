@@ -2,11 +2,6 @@ const { Driver, User } = require('../database/models');
 const { UserReservation } = require('../database/models');
 const { connectToDb } = require('../database/db');
 const { insertUserData } = require('../database/models');
-const {
-  commands,
-  commandsForDrivers,
-  commandsForPassengers,
-} = require('../commands');
 
 const completeRegistration = async (ctx) => {
   try {
@@ -20,7 +15,7 @@ const completeRegistration = async (ctx) => {
     console.log('New Role:', newRole);
     console.log('User Data:', userData);
 
-    ctx.session.userData = { ...userData, role: newRole }; // Обновляем userData
+    ctx.session.userData = { ...userData, role: newRole };
 
     const existingUser = await User.findOne({ telegramId: userId });
 
@@ -93,6 +88,9 @@ const completeRegistration = async (ctx) => {
         await ctx.reply('Вы успешно зарегистрировались как пассажир.');
       }
     }
+
+    // Очистите registrationStep после завершения регистрации
+    ctx.session.registrationStep = null;
   } catch (err) {
     console.error('Ошибка: ', err.message);
     await ctx.reply('Произошла ошибка при регистрации. Попробуйте еще раз.');
@@ -101,7 +99,7 @@ const completeRegistration = async (ctx) => {
 
 const bookSeat = async (ctx, driverId, seat, ruSeat) => {
   try {
-    const driver = await Driver.findOne({ driverId: Number(driverId) });
+    const driver = await Driver.findOne({ driverId });
 
     if (!driver) {
       return ctx.reply('Водитель не найден!');
@@ -116,31 +114,17 @@ const bookSeat = async (ctx, driverId, seat, ruSeat) => {
 
     await driver.save();
 
-    await createReservation(ctx.from.id, driverId, seat);
-
     await ctx.editMessageText(
       `Место ${ruSeat} успешно забронировано у водителя ${driver.name}!`
     );
   } catch (err) {
-    console.error('Ошибка при бронировании места:', err.message);
+    console.error('Ошибка при бронировании места:', err);
     await ctx.reply('Произошла ошибка при бронировании места.');
   }
 };
 
 const createReservation = async (userId, driverId, seat) => {
   try {
-    const driver = await Driver.findOne({ driverId: driverId });
-
-    if (!driver) {
-      console.error('Водитель не найден:', driverId);
-      throw new Error('Водитель не найден.');
-    }
-
-    if (!driver.seats[seat]) {
-      console.error('Место уже занято или недоступно:', seat);
-      throw new Error('Место уже занято или недоступно.');
-    }
-
     const reservation = new UserReservation({
       userId: userId,
       driverId: driverId,
@@ -151,7 +135,7 @@ const createReservation = async (userId, driverId, seat) => {
     console.log('Бронь успешно сохранена:', reservation);
     return reservation;
   } catch (err) {
-    console.error('Ошибка при сохранении брони:', err.message);
+    console.error('Ошибка при сохранении брони:', err);
     throw new Error('Произошла ошибка при сохранении брони.');
   }
 };
