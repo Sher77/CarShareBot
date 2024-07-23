@@ -13,15 +13,15 @@ const start = async () => {
 
     startBot(bot);
 
-    // const webhookUrl = 'https://car-share-bot.railway.app/webhook';
+    const webhookUrl = 'https://car-share-bot.railway.app/webhook';
 
-    // console.log('Попытка установить вебхук на URL:', webhookUrl);
-    // try {
-    //   await bot.api.setWebhook(webhookUrl);
-    //   console.log('Webhook установлен:', webhookUrl);
-    // } catch (error) {
-    //   console.error('Ошибка установки вебхука:', error);
-    // }
+    console.log('Попытка установить вебхук на URL:', webhookUrl);
+    try {
+      await bot.api.setWebhook(webhookUrl);
+      console.log('Webhook установлен:', webhookUrl);
+    } catch (error) {
+      console.error('Ошибка установки вебхука:', error);
+    }
 
     cron.schedule(
       '0 0 * * *',
