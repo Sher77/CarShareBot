@@ -62,7 +62,6 @@ const startBot = (bot) => {
   });
 
   bot.command('my_reservations', async (ctx) => {
-    console.log('my_reservations' + ctx.session.role);
     if (ctx.session.role === 'passenger') {
       try {
         const reservations = await UserReservation.find();
@@ -110,8 +109,6 @@ const startBot = (bot) => {
   });
 
   bot.command('show_my_passengers', async (ctx) => {
-    console.log('show_my_passengers' + ctx.session.role);
-
     if (ctx.session.role === 'driver') {
       try {
         const driver = await Driver.findOne({ driverId: ctx.from.id });
@@ -158,7 +155,6 @@ const startBot = (bot) => {
   });
 
   bot.command('show_drivers', async (ctx) => {
-    console.log('show_drivers' + ctx.session.role);
     if (ctx.session.role === 'passenger') {
       try {
         const drivers = await Driver.find();
@@ -191,8 +187,6 @@ const startBot = (bot) => {
     ctx.session.role = 'driver';
     ctx.session.registrationStep = 'ask_name';
 
-    console.log('Role set to driver:', ctx.session);
-
     await ctx.editMessageReplyMarkup({ reply_markup: null });
     await ctx.reply('Введите Ваше имя: ');
   });
@@ -201,17 +195,11 @@ const startBot = (bot) => {
     ctx.session.role = 'passenger';
     ctx.session.registrationStep = 'ask_name';
 
-    console.log('Role set to passenger:', ctx.session);
-
     await ctx.editMessageReplyMarkup({ reply_markup: null });
     await ctx.reply('Введите Ваше имя: ');
   });
 
   bot.command('show_profile', async (ctx) => {
-    console.log('cdscmdls');
-    console.log('show_profile' + ctx.session.role);
-    console.log('Session after handling text:', ctx.session);
-
     const user = await User.findOne({ telegramId: ctx.from.id });
     const driver = await Driver.findOne({ driverId: user.telegramId });
 
@@ -229,7 +217,6 @@ const startBot = (bot) => {
   });
 
   bot.command('book', async (ctx) => {
-    console.log('book ' + ctx.session.role);
     if (ctx.session.role === 'passenger') {
       try {
         const drivers = await Driver.find();
@@ -275,7 +262,6 @@ const startBot = (bot) => {
   });
 
   bot.command('cancel_reservation', async (ctx) => {
-    console.log('cancel_reservation ' + ctx.session.role);
     if (ctx.session.role === 'passenger') {
       const userId = ctx.from.id;
 

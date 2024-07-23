@@ -11,10 +11,14 @@ const start = async () => {
 
     const bot = new Bot(process.env.BOT_API_TOKEN);
 
-    startBot(bot);
+    try {
+      await bot.api.deleteWebhook();
+      console.log('Webhook удален.');
+    } catch (error) {
+      console.error('Ошибка удаления вебхука:', error);
+    }
 
     const webhookUrl = 'https://car-share-bot.railway.app/webhook';
-
     console.log('Попытка установить вебхук на URL:', webhookUrl);
     try {
       await bot.api.setWebhook(webhookUrl);
@@ -22,6 +26,8 @@ const start = async () => {
     } catch (error) {
       console.error('Ошибка установки вебхука:', error);
     }
+
+    startBot(bot);
 
     cron.schedule(
       '0 0 * * *',
