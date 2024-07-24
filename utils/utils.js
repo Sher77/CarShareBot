@@ -6,6 +6,8 @@ const {
 } = require('../database/models');
 const { connectToDb } = require('../database/db');
 
+const { bot } = require('../index');
+
 const sendNotification = async (userId, message) => {
   try {
     await bot.api.sendMessage(userId, message);

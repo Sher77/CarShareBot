@@ -4,12 +4,14 @@ const { connectToDb, clearReservations } = require('./database/db');
 const cron = require('node-cron');
 const { startBot } = require('./bot');
 
+let bot;
+
 const start = async () => {
   try {
     await connectToDb('CarShareBot');
     console.log('Успешно подключено!');
 
-    const bot = new Bot(process.env.BOT_API_TOKEN);
+    bot = new Bot(process.env.BOT_API_TOKEN);
 
     try {
       await bot.api.deleteWebhook();
@@ -49,3 +51,5 @@ const start = async () => {
 };
 
 start().catch(console.error);
+
+module.exports = { bot };
