@@ -4,6 +4,9 @@ const {
   insertUserData,
   UserReservation,
 } = require('../database/models');
+
+const { Bot } = require('grammy');
+
 const { connectToDb } = require('../database/db');
 
 const bot = new Bot(process.env.BOT_API_TOKEN);
