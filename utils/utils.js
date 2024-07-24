@@ -1,7 +1,18 @@
-const { Driver, User } = require('../database/models');
-const { UserReservation } = require('../database/models');
+const {
+  Driver,
+  User,
+  insertUserData,
+  UserReservation,
+} = require('../database/models');
 const { connectToDb } = require('../database/db');
-const { insertUserData } = require('../database/models');
+
+const sendNotification = async (userId, message) => {
+  try {
+    await bot.api.sendMessage(userId, message);
+  } catch (err) {
+    console.error('Ошибка отправки уведомления:', err);
+  }
+};
 
 const completeRegistration = async (ctx) => {
   try {
@@ -89,7 +100,6 @@ const completeRegistration = async (ctx) => {
       }
     }
 
-    // Очистите registrationStep после завершения регистрации
     ctx.session.registrationStep = null;
   } catch (err) {
     console.error('Ошибка: ', err.message);
@@ -116,6 +126,10 @@ const bookSeat = async (ctx, driverId, seat, ruSeat) => {
 
     await ctx.editMessageText(
       `Место ${ruSeat} успешно забронировано у водителя ${driver.name}!`
+    );
+    sendNotification(
+      driverId,
+      `У вас забронировали ${seat}: ${ctx.from.username}`
     );
   } catch (err) {
     console.error('Ошибка при бронировании места:', err);
@@ -144,4 +158,5 @@ module.exports = {
   bookSeat,
   createReservation,
   completeRegistration,
+  sendNotification,
 };
