@@ -27,10 +27,6 @@ const completeRegistration = async (ctx) => {
     const newRole = ctx.session.role;
     const userData = ctx.session.userData;
 
-    console.log('User ID:', userId);
-    console.log('New Role:', newRole);
-    console.log('User Data:', userData);
-
     ctx.session.userData = { ...userData, role: newRole };
 
     const existingUser = await User.findOne({ telegramId: userId });
@@ -42,12 +38,8 @@ const completeRegistration = async (ctx) => {
         { new: true }
       );
 
-      console.log('User updated in DB');
-
       ctx.session.isLoggedIn = true;
       ctx.session.role = newRole;
-
-      console.log('Session after update:', ctx.session);
 
       if (newRole === 'driver') {
         const existingDriver = await Driver.findOne({ driverId: userId });
@@ -57,7 +49,6 @@ const completeRegistration = async (ctx) => {
             { role: newRole, ...ctx.session.userData },
             { new: true }
           );
-          console.log('Driver updated in DB');
         } else {
           const newDriver = new Driver({
             driverId: userId,
@@ -65,11 +56,11 @@ const completeRegistration = async (ctx) => {
             ...ctx.session.userData,
           });
           await newDriver.save();
-          console.log('New driver saved in DB');
+
+          console.log(newDriver);
         }
       } else {
         await Driver.findOneAndDelete({ driverId: userId });
-        console.log('Driver deleted from DB');
       }
 
       await ctx.reply('Ваши данные обновлены. Добро пожаловать обратно!');
@@ -79,8 +70,6 @@ const completeRegistration = async (ctx) => {
         telegramId: userId,
         ...ctx.session.userData,
       });
-
-      console.log('New user created in DB');
 
       ctx.session.isLoggedIn = true;
       ctx.session.userData = {
@@ -98,7 +87,6 @@ const completeRegistration = async (ctx) => {
         });
 
         await newDriver.save();
-        console.log('New driver saved in DB');
         await ctx.reply('Вы успешно зарегистрировались как водитель.');
       } else {
         await ctx.reply('Вы успешно зарегистрировались как пассажир.');
@@ -113,6 +101,13 @@ const completeRegistration = async (ctx) => {
 };
 
 const bookSeat = async (ctx, driverId, seat, ruSeat) => {
+  const seatMapping = {
+    front: 'спереди',
+    left: 'слева',
+    center: 'посередине',
+    right: 'справа',
+  };
+
   try {
     const driver = await Driver.findOne({ driverId });
 
@@ -132,9 +127,14 @@ const bookSeat = async (ctx, driverId, seat, ruSeat) => {
     await ctx.editMessageText(
       `Место ${ruSeat} успешно забронировано у водителя ${driver.name}!`
     );
+
+    const user = await User.find({ telegramId: ctx.from.id });
+
+    console.log(user);
+
     sendNotification(
       driverId,
-      `У вас забронировали ${seat}: ${ctx.from.username}`
+      `У вас забронировали место ${seatMapping[seat]}: ${user[0].name}`
     );
   } catch (err) {
     console.error('Ошибка при бронировании места:', err);
@@ -151,7 +151,6 @@ const createReservation = async (userId, driverId, seat) => {
     });
 
     await reservation.save();
-    console.log('Бронь успешно сохранена:', reservation);
     return reservation;
   } catch (err) {
     console.error('Ошибка при сохранении брони:', err);

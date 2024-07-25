@@ -48,6 +48,18 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
+const taxiRequestSchema = new mongoose.Schema({
+  passengerIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  pickupLocation: String,
+  dropoffLocation: String,
+  maxSeats: { type: Number, default: 3 },
+  reservedSeats: { type: Number, default: 0 },
+  status: { type: String, enum: ['open', 'closed'], default: 'open' },
+  creatorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+});
+
+const TaxiRequest = mongoose.model('TaxiRequest', taxiRequestSchema);
+
 const insertUserData = async (data) => {
   try {
     const user = new User({ ...data });
@@ -65,5 +77,6 @@ module.exports = {
   UserReservation,
   User,
   userSchema,
+  TaxiRequest,
   insertUserData,
 };

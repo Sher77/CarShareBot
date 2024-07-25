@@ -1,15 +1,13 @@
 require('dotenv').config();
-const { Bot } = require('grammy');
 const { connectToDb, clearReservations } = require('./database/db');
 const cron = require('node-cron');
-const { startBot } = require('./bot');
+const bot = require('./bot');
+const { startBot } = require('./startBot');
 
 const start = async () => {
   try {
     await connectToDb('CarShareBot');
     console.log('Успешно подключено!');
-
-    const bot = new Bot(process.env.BOT_API_TOKEN);
 
     try {
       await bot.api.deleteWebhook();
