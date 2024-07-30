@@ -1,29 +1,30 @@
-require('dotenv').config();
-const { connectToDb, clearReservations } = require('./database/db');
-const cron = require('node-cron');
-const bot = require('./bot');
-const { startBot } = require('./startBot');
+import 'dotenv/config';
+
+import { connectToDb, clearReservations } from './src/db/index.js';
+import cron from 'node-cron';
+import bot from './src/bot.js';
+import { startBot } from './src/startBot.js';
 
 const start = async () => {
   try {
     await connectToDb('CarShareBot');
     console.log('Успешно подключено!');
 
-    try {
-      await bot.api.deleteWebhook();
-      console.log('Webhook удален.');
-    } catch (error) {
-      console.error('Ошибка удаления вебхука:', error);
-    }
+    // try {
+    //   await bot.api.deleteWebhook();
+    //   console.log('Webhook удален.');
+    // } catch (error) {
+    //   console.error('Ошибка удаления вебхука:', error);
+    // }
 
-    const webhookUrl = 'https://car-share-bot.railway.app/webhook';
-    console.log('Попытка установить вебхук на URL:', webhookUrl);
-    try {
-      await bot.api.setWebhook(webhookUrl);
-      console.log('Webhook установлен:', webhookUrl);
-    } catch (error) {
-      console.error('Ошибка установки вебхука:', error);
-    }
+    // const webhookUrl = 'https://car-share-bot.railway.app/webhook';
+    // console.log('Попытка установить вебхук на URL:', webhookUrl);
+    // try {
+    //   await bot.api.setWebhook(webhookUrl);
+    //   console.log('Webhook установлен:', webhookUrl);
+    // } catch (error) {
+    //   console.error('Ошибка установки вебхука:', error);
+    // }
 
     startBot(bot);
 

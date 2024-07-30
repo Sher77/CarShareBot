@@ -1,7 +1,8 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
+import 'dotenv/config';
+import { mongoose } from 'mongoose';
 
-const { UserReservation, Driver } = require('./models');
+import { Driver } from './Driver/index.js';
+import { UserReservation } from './UserReservation/index.js';
 
 let db;
 
@@ -50,4 +51,4 @@ const clearReservations = async () => {
   }
 };
 
-module.exports = { connectToDb, clearReservations };
+export { connectToDb, clearReservations };
