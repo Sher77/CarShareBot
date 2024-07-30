@@ -6,7 +6,7 @@ const loginOrRegisterCallback = async (ctx) => {
     .text('Пассажир', 'passenger');
 
   await ctx.reply(
-    `Привет я CarShareBot! 👋
+    ` Привет я CarShareBot! 👋
 
       Добро пожаловать в нашего бота для бронирования мест в машине. 🚗
 
