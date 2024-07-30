@@ -10,21 +10,21 @@ const start = async () => {
     await connectToDb('CarShareBot');
     console.log('Успешно подключено!');
 
-    // try {
-    //   await bot.api.deleteWebhook();
-    //   console.log('Webhook удален.');
-    // } catch (error) {
-    //   console.error('Ошибка удаления вебхука:', error);
-    // }
+    try {
+      await bot.api.deleteWebhook();
+      console.log('Webhook удален.');
+    } catch (error) {
+      console.error('Ошибка удаления вебхука:', error);
+    }
 
-    // const webhookUrl = 'https://car-share-bot.railway.app/webhook';
-    // console.log('Попытка установить вебхук на URL:', webhookUrl);
-    // try {
-    //   await bot.api.setWebhook(webhookUrl);
-    //   console.log('Webhook установлен:', webhookUrl);
-    // } catch (error) {
-    //   console.error('Ошибка установки вебхука:', error);
-    // }
+    const webhookUrl = 'https://car-share-bot.railway.app/webhook';
+    console.log('Попытка установить вебхук на URL:', webhookUrl);
+    try {
+      await bot.api.setWebhook(webhookUrl);
+      console.log('Webhook установлен:', webhookUrl);
+    } catch (error) {
+      console.error('Ошибка установки вебхука:', error);
+    }
 
     startBot(bot);
 
