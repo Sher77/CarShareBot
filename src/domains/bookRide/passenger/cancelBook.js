@@ -35,6 +35,8 @@ const cancelBook = async (ctx) => {
       }
     }
 
+    cancelKeyboard.text('Отмена', `cancel_book_${userId}`);
+
     await ctx.reply('Выберите бронирование для отмены:', {
       reply_markup: cancelKeyboard,
     });

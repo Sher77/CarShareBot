@@ -3,6 +3,10 @@ import { sendNotification } from '../utils/utils.js';
 import { seatMapping } from '../utils/utils.js';
 
 const cancelReservationCallback = async (data, ctx) => {
+  if (data.startsWith('cancel_book_')) {
+    return await ctx.editMessageText('Вы решили не отменять бронирование!');
+  }
+
   if (data.startsWith('cancel_')) {
     const reservationId = data.split('_')[1];
 

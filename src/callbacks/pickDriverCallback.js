@@ -118,7 +118,9 @@ const sendConfirmationRequest = async (
       }
     );
 
-    await ctx.reply('Запрос на подтверждение бронирования отправлен водителю.');
+    await ctx.editMessageText(
+      `Запрос на подтверждение бронирования места(${seat}) отправлен водителю - ${driver.name}.`
+    );
   } catch (err) {
     console.error(
       'Ошибка при отправке запроса на подтверждение бронирования:',
@@ -133,7 +135,6 @@ const sendConfirmationRequest = async (
 const handleBookingResponse = async (data, ctx) => {
   if (data.startsWith('confirm_') || data.startsWith('reject_')) {
     const [action, driverId, seat, passengerId] = data.split('_');
-    console.log(action, driverId, seat, passengerId);
 
     try {
       const passenger = await User.findOne({ telegramId: passengerId });
@@ -143,21 +144,29 @@ const handleBookingResponse = async (data, ctx) => {
       }
 
       if (action === 'confirm') {
-        await bookSeat(ctx, Number(driverId), seat, seatMapping[seat]);
+        await bookSeat(
+          ctx,
+          Number(driverId),
+          passenger,
+          seat,
+          seatMapping[seat]
+        );
         const reservation = await createUserReservation({
           userId: passengerId,
           driverId: Number(driverId),
           seat: seat,
         });
+        const driver = await Driver.findOne({ driverId });
         await ctx.reply(
           `Вы подтвердили бронирование места ${seatMapping[seat]}`
         );
         sendNotification(
           passenger.telegramId,
-          `Ваше бронирование места ${seatMapping[seat]} у водителя подтвержено.`
+          `Ваше бронирование места ${seatMapping[seat]} у водителя ${driver.name} подтвержено.`
         );
       } else if (action === 'reject') {
         await ctx.reply(`Вы отклонили бронирование места ${seatMapping[seat]}`);
+        await ctx.editMessageReplyMarkup(null);
         sendNotification(
           passenger.telegramId,
           `Ваше бронирование места ${seatMapping[seat]} у водителя отклонено.`

@@ -1,7 +1,7 @@
 import { User, Driver } from '../../../db/collections.js';
 import { sendNotification, seatMapping } from '../../../utils/utils.js';
 
-const bookSeat = async (ctx, driverId, seat, ruSeat) => {
+const bookSeat = async (ctx, driverId, passenger, seat, ruSeat) => {
   let originalSeatStatus;
   let originalPassenger;
   let originalId;
@@ -23,17 +23,20 @@ const bookSeat = async (ctx, driverId, seat, ruSeat) => {
 
     driver.seats[seat] = false;
 
-    const user = await User.findOne({ telegramId: ctx.from.id });
+    const user = await User.findOne({ telegramId: driverId });
     if (!user) {
       return ctx.reply('Пользователь не найден!');
     }
 
-    driver.passengers[seat] = user.name;
-    driver.ids[seat] = user.telegramId;
+    driver.passengers[seat] = passenger.name;
+    driver.ids[seat] = passenger.telegramId;
+
     await driver.save();
 
-    await ctx.editMessageText(`Место ${ruSeat} успешно забронировано!`);
-
+    // await ctx.reply(`Место ${ruSeat} успешно забронировано!`, {
+    //   reply_markup: null,
+    // });
+    await ctx.editMessageReplyMarkup(null);
     // sendNotification(
     //   driverId,
     //   `У вас забронировали место ${seatMapping[seat]}: ${user.name}`

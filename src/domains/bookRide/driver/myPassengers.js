@@ -24,10 +24,11 @@ const myPassengers = async (ctx) => {
         return await ctx.reply('Нет занятых мест.');
       }
 
-      // let response = `Занятые места у водителя ${driver.name}:\n\n`;
       let response = `Занятые места:\n\n`;
 
       occupiedSeats.forEach((seat) => {
+        console.log(seat, driver.passengers[seat], driver);
+
         response += `Место ${seatMapping[seat]}: ${
           driver.passengers[seat] || 'Неизвестный пассажир'
         }\n`;

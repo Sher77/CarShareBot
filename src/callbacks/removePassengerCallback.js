@@ -44,7 +44,7 @@ const removePassengerCallback = async (data, ctx) => {
 
       sendNotification(
         passengerId,
-        `${driver.name} удалил Ваше бронь с места: ${seatMapping[seat]}`
+        `${driver.name} удалил Вашу бронь с места: ${seatMapping[seat]}`
       );
 
       passenger = null;
