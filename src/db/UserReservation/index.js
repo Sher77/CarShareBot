@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const UserReservationSchema = new mongoose.Schema({
-  userId: { type: String, required: true },
+  userId: { type: Number, required: true },
   driverId: { type: Number, required: true },
   seat: {
     type: String,

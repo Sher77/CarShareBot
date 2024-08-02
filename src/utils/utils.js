@@ -5,6 +5,12 @@ import { Driver } from '../db/Driver/index.js';
 import { Bot } from 'grammy';
 const bot = new Bot(process.env.BOT_API_TOKEN);
 
+const seatMapping = {
+  front: 'спереди',
+  left: 'слева',
+  center: 'посередине',
+  right: 'справа',
+};
 const sendNotification = async (userId, message) => {
   try {
     await bot.api.sendMessage(userId, message);
@@ -14,13 +20,6 @@ const sendNotification = async (userId, message) => {
 };
 
 const bookSeat = async (ctx, driverId, seat, ruSeat) => {
-  const seatMapping = {
-    front: 'спереди',
-    left: 'слева',
-    center: 'посередине',
-    right: 'справа',
-  };
-
   try {
     const driver = await Driver.findOne({ driverId });
 
@@ -53,20 +52,4 @@ const bookSeat = async (ctx, driverId, seat, ruSeat) => {
   }
 };
 
-const createReservation = async (userId, driverId, seat) => {
-  try {
-    const reservation = new UserReservation({
-      userId: userId,
-      driverId: driverId,
-      seat: seat,
-    });
-
-    await reservation.save();
-    return reservation;
-  } catch (err) {
-    console.error('Ошибка при сохранении брони:', err);
-    throw new Error('Произошла ошибка при сохранении брони.');
-  }
-};
-
-export { bookSeat, createReservation, sendNotification };
+export { bookSeat, sendNotification, seatMapping };

@@ -1,6 +1,6 @@
 import { UserReservation, Driver } from '../../../db/collections.js';
-
 import { InlineKeyboard } from 'grammy';
+import { seatMapping } from '../../../utils/utils.js';
 
 const cancelBook = async (ctx) => {
   if (ctx.session.role === 'passenger') {
@@ -12,22 +12,16 @@ const cancelBook = async (ctx) => {
       return ctx.reply('У вас нет активных броней.');
     }
 
-    const seatMapping = {
-      front: 'спереди',
-      left: 'слева',
-      center: 'посередине',
-      right: 'справа',
-    };
-
     const cancelKeyboard = new InlineKeyboard();
 
     for (const reservation of reservations) {
       const driver = await Driver.findOne({ driverId: reservation.driverId });
+      const driverSeat = seatMapping[reservation.seat];
 
       if (driver) {
         cancelKeyboard
           .text(
-            `Отменить ${seatMapping[reservation.seat]} у ${driver.name}`,
+            `Отменить ${driverSeat} у ${driver.name}`,
             `cancel_${reservation._id}`
           )
           .row();

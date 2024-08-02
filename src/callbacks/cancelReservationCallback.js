@@ -1,14 +1,8 @@
 import { UserReservation, Driver } from '../db/collections.js';
-
 import { sendNotification } from '../utils/utils.js';
+import { seatMapping } from '../utils/utils.js';
 
 const cancelReservationCallback = async (data, ctx) => {
-  const seatMapping = {
-    front: 'спереди',
-    left: 'слева',
-    center: 'посередине',
-    right: 'справа',
-  };
   if (data.startsWith('cancel_')) {
     const reservationId = data.split('_')[1];
 
@@ -31,7 +25,7 @@ const cancelReservationCallback = async (data, ctx) => {
 
       sendNotification(
         driver.driverId,
-        ` ${driver.passengers[seat]} отменил у Вас бронь ${seatMapping[seat]}:`
+        ` ${driver.passengers[seat]} отменил у Вас бронь ${seatMapping[seat]}.`
       );
 
       driver.seats[seat] = true;

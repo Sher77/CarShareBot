@@ -1,17 +1,10 @@
 import { User, Driver } from '../../../db/collections.js';
-
-import { sendNotification } from '../../../utils/utils.js';
+import { sendNotification, seatMapping } from '../../../utils/utils.js';
 
 const bookSeat = async (ctx, driverId, seat, ruSeat) => {
-  const seatMapping = {
-    front: 'спереди',
-    left: 'слева',
-    center: 'посередине',
-    right: 'справа',
-  };
-
   let originalSeatStatus;
   let originalPassenger;
+  let originalId;
 
   try {
     const driver = await Driver.findOne({ driverId });
@@ -26,6 +19,7 @@ const bookSeat = async (ctx, driverId, seat, ruSeat) => {
 
     originalSeatStatus = driver.seats[seat];
     originalPassenger = driver.passengers[seat];
+    originalId = driver.ids[seat];
 
     driver.seats[seat] = false;
 
@@ -35,6 +29,7 @@ const bookSeat = async (ctx, driverId, seat, ruSeat) => {
     }
 
     driver.passengers[seat] = user.name;
+    driver.ids[seat] = user.telegramId;
     await driver.save();
 
     await ctx.editMessageText(
@@ -52,6 +47,7 @@ const bookSeat = async (ctx, driverId, seat, ruSeat) => {
       const driver = await Driver.findOne({ driverId });
       driver.seats[seat] = originalSeatStatus;
       driver.passengers[seat] = originalPassenger;
+      driver.ids[seat] = originalId;
       await driver.save();
     }
 

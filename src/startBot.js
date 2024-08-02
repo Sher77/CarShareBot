@@ -43,6 +43,9 @@ import {
   showTaxiKeyboard,
   showUserProfileMenu,
 } from './utils/keyboards.js';
+import { removePassenger } from './domains/bookRide/driver/removePassenger.js';
+import { removePassengerCallback } from './callbacks/removePassengerCallback.js';
+import { showActiveTaxi } from './domains/taxiRequest/passenger/showActiveTaxi.js';
 
 const startBot = (bot) => {
   bot.use(
@@ -65,7 +68,8 @@ const startBot = (bot) => {
 
     if (role === 'driver') {
       keyboard = [
-        [{ text: 'Показать моих пассажиров' }],
+        [{ text: '🧑‍🤝‍🧑 Показать моих пассажиров' }],
+        [{ text: '❌ Удалить моего пассажира' }],
         [{ text: '👤 Мой профиль' }],
         [{ text: 'ℹ️ О боте' }],
       ];
@@ -160,6 +164,10 @@ const startBot = (bot) => {
     showMyTaxi(ctx);
   });
 
+  bot.command('show_active_taxi', async (ctx) => {
+    showActiveTaxi(ctx);
+  });
+
   bot.command('show_my_companions', async (ctx) => {
     showMyCompanions(ctx);
   });
@@ -185,17 +193,20 @@ const startBot = (bot) => {
   });
 
   bot.command('ride_in_a_taxi', async (ctx) => {
-    await rideInATaxi(ctx);
+    rideInATaxi(ctx);
   });
 
   bot.command('close_taxi_request', async (ctx) => {
     closeTaxiRequest(ctx);
   });
 
-  bot.on('callback_query:data', async (ctx) => {
-    if (ctx.session.role === 'passenger') {
-      const data = ctx.callbackQuery.data;
+  bot.command('remove_passenger', async (ctx) => {
+    removePassenger(ctx);
+  });
 
+  bot.on('callback_query:data', async (ctx) => {
+    const data = ctx.callbackQuery.data;
+    if (ctx.session.role === 'passenger') {
       pickDriverCallback(data, ctx);
       cancelReservationCallback(data, ctx);
       reserveTaxiCallback(data, ctx);
@@ -203,7 +214,7 @@ const startBot = (bot) => {
       cancelReservationTaxiCallback(data, ctx);
       bookTaxiCallback(data, ctx);
     } else if (ctx.session.role === 'driver') {
-      await ctx.reply('Команда только для пассажиров');
+      removePassengerCallback(data, ctx);
     } else {
       await ctx.reply('Для начала необходимо войти или зарегистироваться!');
     }
@@ -282,8 +293,11 @@ const startBot = (bot) => {
       }
     } else if (ctx.session.role === 'driver') {
       switch (messageText) {
-        case 'Показать моих пассажиров':
+        case '🧑‍🤝‍🧑 Показать моих пассажиров':
           await myPassengers(ctx);
+          break;
+        case '❌ Удалить моего пассажира':
+          await removePassenger(ctx);
           break;
         case '👤 Мой профиль':
           await showUserProfileMenu(ctx);

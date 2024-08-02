@@ -19,6 +19,12 @@ const DriverSchema = new mongoose.Schema({
     center: { type: String, default: '' },
     right: { type: String, default: '' },
   },
+  ids: {
+    front: { type: Number, default: '' },
+    left: { type: Number, default: '' },
+    center: { type: Number, default: '' },
+    right: { type: Number, default: '' },
+  },
 });
 
 const Driver = mongoose.model('Driver', DriverSchema);

@@ -50,6 +50,7 @@ const reserveTaxiCallback = async (data, ctx) => {
         );
       }
 
+      await ctx.reply('Вы успешно забронировали место в такси.');
       await ctx.editMessageText('Вы успешно забронировали место в такси.', {
         reply_markup: { inline_keyboard: [] },
       });

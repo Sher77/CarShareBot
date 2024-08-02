@@ -11,6 +11,7 @@ const commands = [
   { command: 'show_profile', description: 'Посмотреть профиль' },
   { command: 'show_drivers', description: 'Показать водителей' },
   { command: 'show_my_passengers', description: 'Показать моих пассажиров' },
+  { command: 'remove_passenger', description: 'Удалить пассажира' },
   {
     command: 'show_my_companions',
     description: 'Показать моих попутчиков',
@@ -22,6 +23,10 @@ const commands = [
   {
     command: 'show_my_taxi',
     description: 'Показать мои активные запросы такси',
+  },
+  {
+    command: 'show_active_taxi',
+    description: 'Показать активные запросы такси',
   },
   { command: 'ride_in_a_taxi', description: 'Подбросить на такси' },
   { command: 'close_taxi_request', description: 'Закрыть запрос на такси' },

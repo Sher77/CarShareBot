@@ -1,4 +1,4 @@
-import { Driver } from '../db/collections.js';
+import { Driver, UserReservation } from '../db/collections.js';
 import { InlineKeyboard } from 'grammy';
 
 import { bookSeat } from '../domains/bookRide/passenger/bookSeat.js';
@@ -67,16 +67,17 @@ const pickDriverCallback = async (data, ctx) => {
 
     const englishSeat = seatMapping[seat];
 
+    let reservation;
+
     if (englishSeat) {
       try {
         await bookSeat(ctx, Number(driverId), englishSeat, seat);
 
-        const reservation = await createUserReservation({
+        reservation = await createUserReservation({
           userId: ctx.from.id,
           driverId: Number(driverId),
           seat: englishSeat,
         });
-
         await ctx.reply(`Вы успешно забронировали место ${seat} у водителя.`);
       } catch (err) {
         console.error('Ошибка при бронировании места:', err);

@@ -1,16 +1,10 @@
 import { UserReservation, Driver } from '../../../db/collections.js';
+import { seatMapping } from '../../../utils/utils.js';
 
 const myReservations = async (ctx) => {
   if (ctx.session.role === 'passenger') {
     try {
       const reservations = await UserReservation.find();
-
-      const seatMapping = {
-        front: 'спереди',
-        left: 'слева',
-        center: 'посередине',
-        right: 'справа',
-      };
 
       let response = '';
 

@@ -37,6 +37,7 @@ const helpCallback = async (ctx) => {
   const driverCommands = `
       /show_profile - Просмотреть профиль
       /show_my_passengers - Показать моих пассажиров
+      /remove_passenger - Удалить пассажира
     `;
 
   const generalCommands = `
