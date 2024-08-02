@@ -26,17 +26,25 @@ const helpCallback = async (ctx) => {
       /book - Забронировать место в машине
       /cancel_reservation - Отменить бронирование
       /show_profile - Просмотреть профиль
+      /update_profile - Обновить профиль
       /show_drivers - Показать водителей
       /my_reservations - Показать ваши текущие бронирования
+      /ride_in_a_taxi - Подбросить на такси
+      /show_active_taxi - Показать активные запросы такси
       /show_my_taxi - Показать мои активные запросы такси
       /show_my_companions - Показать моих попутчиков
       /book_taxi - Забронировать место в такси
       /cancel_book_taxi - Отменить бронь в такси
+      /close_taxi_request - Закрыть запрос на такси
+      /show_my_companions - Показать попутчиков в такси
+      /show_my_companions_as_passenger - Показать попутчиков в такси (Заказывающий)
     `;
 
   const driverCommands = `
-      /show_profile - Просмотреть профиль
       /show_my_passengers - Показать моих пассажиров
+      /remove_passenger - Показать моих пассажиров
+      /show_profile - Просмотреть профиль
+      /update_profile - Обновить профиль
       /remove_passenger - Удалить пассажира
     `;
 

@@ -1,4 +1,4 @@
-import { InlineKeyboard, Keyboard, session } from 'grammy';
+import { InlineKeyboard, session } from 'grammy';
 import { commands } from './commands/commands.js';
 
 import {
@@ -43,9 +43,13 @@ import {
   showTaxiKeyboard,
   showUserProfileMenu,
 } from './utils/keyboards.js';
+
 import { removePassenger } from './domains/bookRide/driver/removePassenger.js';
 import { removePassengerCallback } from './callbacks/removePassengerCallback.js';
 import { showActiveTaxi } from './domains/taxiRequest/passenger/showActiveTaxi.js';
+
+import { connectToDb } from './db/index.js';
+import { User } from './db/collections.js';
 
 const startBot = (bot) => {
   bot.use(
@@ -96,22 +100,41 @@ const startBot = (bot) => {
   });
 
   bot.command('start', async (ctx) => {
-    const startKeyboard = new InlineKeyboard()
-      .text('Водитель', 'driver')
-      .text('Пассажир', 'passenger');
+    const userId = ctx.from.id;
 
-    await ctx.reply(
-      `Привет я CarShareBot! 👋
+    try {
+      await connectToDb('CarShareBot');
 
-      Добро пожаловать в нашего бота для бронирования мест в машине. 🚗
+      const existingUser = await User.findOne({ telegramId: userId });
 
-      Чтобы начать, выберите вашу роль для регистрации. Если у вас есть вопросы, просто напишите(/help), и мы поможем!
+      if (existingUser) {
+        ctx.session.isLoggedIn = true;
+        ctx.session.role = existingUser.role;
 
-      Приятных поездок!`,
-      {
-        reply_markup: startKeyboard,
+        await ctx.reply(`Добро пожаловать обратно, ${existingUser.name}!`);
+        // Можете добавить код для отображения главного меню или любой другой логики
+      } else {
+        const startKeyboard = new InlineKeyboard()
+          .text('Водитель', 'driver')
+          .text('Пассажир', 'passenger');
+
+        await ctx.reply(
+          `Привет, я CarShareBot! 👋
+  
+          Добро пожаловать в нашего бота для бронирования мест в машине. 🚗
+  
+          Чтобы начать, выберите вашу роль для регистрации. Если у вас есть вопросы, просто напишите(/help), и мы поможем!
+  
+          Приятных поездок!`,
+          {
+            reply_markup: startKeyboard,
+          }
+        );
       }
-    );
+    } catch (error) {
+      console.error('Ошибка при обработке команды /start:', error);
+      await ctx.reply('Произошла ошибка. Попробуйте еще раз.');
+    }
   });
 
   bot.command('help', async (ctx) => {

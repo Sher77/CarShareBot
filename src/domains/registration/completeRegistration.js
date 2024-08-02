@@ -1,5 +1,10 @@
 import { connectToDb } from '../../db/index.js';
-import { User, Driver } from '../../db/collections.js';
+import {
+  User,
+  Driver,
+  TaxiRequest,
+  UserReservation,
+} from '../../db/collections.js';
 import { createUser } from '../../data/UserData/index.js';
 
 const completeRegistration = async (ctx) => {
@@ -15,6 +20,8 @@ const completeRegistration = async (ctx) => {
     const existingUser = await User.findOne({ telegramId: userId });
 
     if (existingUser) {
+      const wasDriver = existingUser.role === 'driver';
+
       await User.findOneAndUpdate(
         { telegramId: userId },
         { role: newRole, ...ctx.session.userData },
@@ -25,8 +32,7 @@ const completeRegistration = async (ctx) => {
       ctx.session.role = newRole;
 
       if (newRole === 'driver') {
-        const existingDriver = await Driver.findOne({ driverId: userId });
-        if (existingDriver) {
+        if (wasDriver) {
           await Driver.findOneAndUpdate(
             { driverId: userId },
             { role: newRole, ...ctx.session.userData },
@@ -39,9 +45,14 @@ const completeRegistration = async (ctx) => {
             ...ctx.session.userData,
           });
           await newDriver.save();
+
+          await TaxiRequest.deleteMany({ creatorId: existingUser._id });
         }
       } else {
-        await Driver.findOneAndDelete({ driverId: userId });
+        if (wasDriver) {
+          await UserReservation.deleteMany({ driverId: userId });
+          await Driver.findOneAndDelete({ driverId: userId });
+        }
       }
 
       await ctx.reply('Ваши данные обновлены. Добро пожаловать обратно!');

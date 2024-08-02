@@ -40,7 +40,7 @@ const handleTaxiRequestCreation = async (ctx) => {
         passenger.telegramId,
         `${user.name} может Вас подбросить:\nМесто отправления: ${ctx.session.taxiRequest.pickupLocation}\nМесто назначения: ${ctx.session.taxiRequest.dropoffLocation}\n`
       );
-      sendNotification(
+      await bot.api.sendMessage(
         passenger.telegramId,
         'Нажмите на кнопку, чтобы забронировать место',
         {
