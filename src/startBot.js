@@ -50,6 +50,7 @@ import { showActiveTaxi } from './domains/taxiRequest/passenger/showActiveTaxi.j
 
 import { connectToDb } from './db/index.js';
 import { User } from './db/collections.js';
+import { handleBookingResponse } from './callbacks/pickDriverCallback.js';
 
 const startBot = (bot) => {
   bot.use(
@@ -112,7 +113,6 @@ const startBot = (bot) => {
         ctx.session.role = existingUser.role;
 
         await ctx.reply(`Добро пожаловать обратно, ${existingUser.name}!`);
-        // Можете добавить код для отображения главного меню или любой другой логики
       } else {
         const startKeyboard = new InlineKeyboard()
           .text('Водитель', 'driver')
@@ -237,6 +237,7 @@ const startBot = (bot) => {
       cancelReservationTaxiCallback(data, ctx);
       bookTaxiCallback(data, ctx);
     } else if (ctx.session.role === 'driver') {
+      handleBookingResponse(data, ctx);
       removePassengerCallback(data, ctx);
     } else {
       await ctx.reply('Для начала необходимо войти или зарегистироваться!');

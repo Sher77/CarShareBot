@@ -1,4 +1,4 @@
-import { Driver, UserReservation } from '../db/collections.js';
+import { Driver, User } from '../db/collections.js';
 import { InlineKeyboard } from 'grammy';
 
 import { bookSeat } from '../domains/bookRide/passenger/bookSeat.js';
@@ -6,6 +6,9 @@ import { bookSeat } from '../domains/bookRide/passenger/bookSeat.js';
 import { createUserReservation } from '../data/UserReservation/index.js';
 
 import { showMainMenuPassenger } from '../utils/keyboards.js';
+
+import bot from '../bot.js';
+import { seatMapping, sendNotification } from '../utils/utils.js';
 
 const pickDriverCallback = async (data, ctx) => {
   if (data === 'picked_driver_cancel') {
@@ -67,18 +70,15 @@ const pickDriverCallback = async (data, ctx) => {
 
     const englishSeat = seatMapping[seat];
 
-    let reservation;
-
     if (englishSeat) {
       try {
-        await bookSeat(ctx, Number(driverId), englishSeat, seat);
-
-        reservation = await createUserReservation({
-          userId: ctx.from.id,
-          driverId: Number(driverId),
-          seat: englishSeat,
-        });
-        await ctx.reply(`Вы успешно забронировали место ${seat} у водителя.`);
+        await sendConfirmationRequest(
+          ctx,
+          Number(driverId),
+          ctx.from.id,
+          englishSeat,
+          seat
+        );
       } catch (err) {
         console.error('Ошибка при бронировании места:', err);
         await ctx.reply('Произошла ошибка бронирования места.');
@@ -87,4 +87,87 @@ const pickDriverCallback = async (data, ctx) => {
   }
 };
 
+const sendConfirmationRequest = async (
+  ctx,
+  driverId,
+  userId,
+  englishSeat,
+  seat
+) => {
+  try {
+    const driver = await Driver.findOne({ driverId });
+    const user = await User.findOne({ telegramId: driver.driverId });
+
+    if (!driver || !user.telegramId) {
+      return await ctx.reply('Водитель не найден или у него нет telegramId.');
+    }
+
+    const passengerId = ctx.from.id;
+
+    const confirmKeyboard = new InlineKeyboard()
+      .text('Подтвердить', `confirm_${driverId}_${englishSeat}_${userId}`)
+      .text('Отклонить', `reject_${driverId}_${englishSeat}_${userId}`);
+
+    const passenger = await User.findOne({ telegramId: passengerId });
+
+    await bot.api.sendMessage(
+      user.telegramId,
+      `Пассажир ${passenger.name} хочет забронировать место ${seat}. Подтвердить бронирование?`,
+      {
+        reply_markup: confirmKeyboard,
+      }
+    );
+
+    await ctx.reply('Запрос на подтверждение бронирования отправлен водителю.');
+  } catch (err) {
+    console.error(
+      'Ошибка при отправке запроса на подтверждение бронирования:',
+      err
+    );
+    await ctx.reply(
+      'Произошла ошибка при отправке запроса на подтверждение бронирования.'
+    );
+  }
+};
+
+const handleBookingResponse = async (data, ctx) => {
+  if (data.startsWith('confirm_') || data.startsWith('reject_')) {
+    const [action, driverId, seat, passengerId] = data.split('_');
+    console.log(action, driverId, seat, passengerId);
+
+    try {
+      const passenger = await User.findOne({ telegramId: passengerId });
+
+      if (!passenger) {
+        return await ctx.reply('Отправитель не найден!');
+      }
+
+      if (action === 'confirm') {
+        await bookSeat(ctx, Number(driverId), seat, seatMapping[seat]);
+        const reservation = await createUserReservation({
+          userId: passengerId,
+          driverId: Number(driverId),
+          seat: seat,
+        });
+        await ctx.reply(
+          `Вы подтвердили бронирование места ${seatMapping[seat]}`
+        );
+        sendNotification(
+          passenger.telegramId,
+          `Ваше бронирование места ${seatMapping[seat]} у водителя подтвержено.`
+        );
+      } else if (action === 'reject') {
+        await ctx.reply(`Вы отклонили бронирование места ${seatMapping[seat]}`);
+        sendNotification(
+          passenger.telegramId,
+          `Ваше бронирование места ${seatMapping[seat]} у водителя отклонено.`
+        );
+      }
+    } catch (err) {
+      console.log(err.message);
+    }
+  }
+};
+
 export default pickDriverCallback;
+export { handleBookingResponse };

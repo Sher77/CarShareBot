@@ -32,14 +32,12 @@ const bookSeat = async (ctx, driverId, seat, ruSeat) => {
     driver.ids[seat] = user.telegramId;
     await driver.save();
 
-    await ctx.editMessageText(
-      `Место ${ruSeat} успешно забронировано у водителя ${driver.name}!`
-    );
+    await ctx.editMessageText(`Место ${ruSeat} успешно забронировано!`);
 
-    sendNotification(
-      driverId,
-      `У вас забронировали место ${seatMapping[seat]}: ${user.name}`
-    );
+    // sendNotification(
+    //   driverId,
+    //   `У вас забронировали место ${seatMapping[seat]}: ${user.name}`
+    // );
   } catch (err) {
     console.error('Ошибка при бронировании места:', err);
 
