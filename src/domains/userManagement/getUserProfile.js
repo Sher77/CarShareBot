@@ -16,7 +16,7 @@ const showUserProfile = async (ctx) => {
 📞 Телефон: ${user.phone}
 👥 Роль: пассажир 
 
-Спасибо, что вы с нами!
+Спасибо, что Вы с нами!
         `
     );
   } else if (ctx.session.role === 'driver') {
@@ -33,7 +33,7 @@ const showUserProfile = async (ctx) => {
 🔢 Возраст: ${driver.age}
 🚙Роль: водитель
 
-Спасибо, что вы с нами!
+Спасибо, что Вы с нами!
 `
     );
   } else {
