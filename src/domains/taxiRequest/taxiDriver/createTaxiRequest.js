@@ -2,6 +2,8 @@ import { User, TaxiRequest } from '../../../db/collections.js';
 
 import bot from '../../../bot.js';
 
+import { sendNotification } from '../../../utils/utils.js';
+
 const handleTaxiRequestCreation = async (ctx) => {
   const currentStep = ctx.session.registrationStep;
 
@@ -34,12 +36,11 @@ const handleTaxiRequestCreation = async (ctx) => {
     });
 
     for (const passenger of allPassengers) {
-      await bot.api.sendMessage(
+      sendNotification(
         passenger.telegramId,
         `${user.name} может Вас подбросить:\nМесто отправления: ${ctx.session.taxiRequest.pickupLocation}\nМесто назначения: ${ctx.session.taxiRequest.dropoffLocation}\n`
       );
-
-      await bot.api.sendMessage(
+      sendNotification(
         passenger.telegramId,
         'Нажмите на кнопку, чтобы забронировать место',
         {

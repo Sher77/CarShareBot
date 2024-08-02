@@ -11,6 +11,7 @@ const seatMapping = {
   center: 'посередине',
   right: 'справа',
 };
+
 const sendNotification = async (userId, message) => {
   try {
     await bot.api.sendMessage(userId, message);

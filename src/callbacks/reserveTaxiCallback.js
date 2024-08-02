@@ -1,6 +1,7 @@
 import { User, TaxiRequest } from '../db/collections.js';
 
 import bot from '../bot.js';
+import { sendNotification } from '../utils/utils.js';
 
 const reserveTaxiCallback = async (data, ctx) => {
   if (data === 'reserve_taxi_cancel') {
@@ -42,7 +43,7 @@ const reserveTaxiCallback = async (data, ctx) => {
       await taxiRequest.save();
 
       if (creator && creator.telegramId) {
-        await bot.api.sendMessage(
+        sendNotification(
           creator.telegramId,
           `Пользователь ${
             passenger ? passenger.name : 'Неизвестный'

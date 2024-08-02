@@ -1,6 +1,7 @@
 import { User, TaxiRequest } from '../db/collections.js';
 
 import bot from '../bot.js';
+import { sendNotification } from '../utils/utils.js';
 
 const bookTaxiCallback = async (data, ctx) => {
   if (data.startsWith('taxi_book')) {
@@ -32,7 +33,7 @@ const bookTaxiCallback = async (data, ctx) => {
 
       const creator = await User.findById(taxiRequest.creatorId);
       if (creator && creator.telegramId) {
-        await bot.api.sendMessage(
+        sendNotification(
           creator.telegramId,
           `Пользователь ${passenger.name} забронировал место в вашем такси.`
         );

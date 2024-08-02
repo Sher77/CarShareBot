@@ -1,6 +1,6 @@
 import { Driver, UserReservation } from '../db/collections.js';
 import bot from '../bot.js';
-import { seatMapping } from '../utils/utils.js';
+import { seatMapping, sendNotification } from '../utils/utils.js';
 
 const removePassengerCallback = async (data, ctx) => {
   if (data === 'cancel_remove') {
@@ -42,7 +42,7 @@ const removePassengerCallback = async (data, ctx) => {
         `Пассажир ${passenger} был удален с места ${seatMapping[seat]}.`
       );
 
-      await bot.api.sendMessage(
+      sendNotification(
         passengerId,
         `${driver.name} удалил Ваше бронь с места: ${seatMapping[seat]}`
       );

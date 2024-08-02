@@ -1,6 +1,7 @@
 import { User, TaxiRequest } from '../db/collections.js';
 
 import bot from '../bot.js';
+import { sendNotification } from '../utils/utils.js';
 
 const closeTaxiRequestCallback = async (data, ctx) => {
   if (data === 'close_cancel') {
@@ -27,7 +28,7 @@ const closeTaxiRequestCallback = async (data, ctx) => {
 
         if (passenger && passenger.telegramId) {
           try {
-            await bot.api.sendMessage(
+            sendNotification(
               passenger.telegramId,
               `Запрос на такси был закрыт владельцем: с ${taxiRequest.pickupLocation} до ${taxiRequest.dropoffLocation}.`
             );
